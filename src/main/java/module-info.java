@@ -1,8 +1,8 @@
-module com.example.firstproject {
+module com.example.TicTacToe {
     requires javafx.controls;
     requires javafx.fxml;
 
 
-    opens com.example.firstproject to javafx.fxml;
-    exports com.example.firstproject;
+    opens com.example.TicTacToe to javafx.fxml;
+    exports com.example.TicTacToe;
 }
