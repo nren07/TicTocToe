@@ -1,15 +1,19 @@
 package com.example.TicTacToe;
 
 import javafx.application.Application;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Shadow;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Shape3D;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,13 +25,19 @@ public class TicTacToe extends Application {
     private Label playerXScoreLabel,playerOScoreLabel;
     private boolean playerXturn=true;
     private int playerXScore=0,playerOScore=0;
+    private Button btnX=null;
     private void buttonClick(Button btn){
         if(btn.getText().equals("")){
             if(playerXturn){
                 btn.setText("X");
-            }else btn.setText("O");
+                btn.setStyle("-fx-background-color: #FFCCCB; ");
+            }else {
+                btn.setText("O");
+                btn.setStyle("-fx-background-color: #FFFFE0; ");
+            }
             playerXturn=!playerXturn;
             checkWinner();
+            btnX=btn;
         }
     }
 
@@ -72,7 +82,8 @@ public class TicTacToe extends Application {
             showDialog(winner);
             updateScore(winner);
             resetBoard();
-        }else if( buttons[row][2-col].getText().equals(buttons[row+1][col+1].getText())
+        }
+        if( buttons[row][2-col].getText().equals(buttons[row+1][col+1].getText())
                 && buttons[row+1][col+1].getText().equals(buttons[row+2][col].getText())
                 && !buttons[row][col+2].getText().isEmpty()){
             String winner=buttons[row][col+2].getText();
@@ -120,24 +131,45 @@ public class TicTacToe extends Application {
         for(Button row[] : buttons){
             for(Button btn : row){
                 btn.setText("");
+                btn.setStyle(null);
             }
         }
+
+    }
+    public void reset(){
+        for(Button row[] : buttons){
+            for(Button btn : row){
+                btn.setText("");
+                btn.setStyle(null);
+            }
+        }
+        playerXScore=0;
+        playerOScore=0;
+        playerXScoreLabel.setText("Player X : "+playerXScore);
+        playerOScoreLabel.setText("Player O : "+playerOScore);
+    }
+    private void undo(){
+        btnX.setText("");
+        btnX.setStyle(null);
+        playerXturn=!playerXturn;
     }
     private BorderPane createContent(){
         BorderPane root=new BorderPane();
+        root.setStyle("-fx-background-color: #D3D3D9;");
 //        title
         Label titleLabel =new Label("Tic Tac Toe");
         titleLabel.setStyle("-fx-font-size : 24pt; -fx-font-weight : bold");
+
         root.setTop(titleLabel);
-        BorderPane.setAlignment(titleLabel, Pos.TOP_CENTER);
-        BorderPane.setAlignment(titleLabel, Pos.BOTTOM_CENTER);
+        BorderPane.setAlignment(titleLabel,Pos.CENTER);
 
 //        game Board
 
         GridPane gridPane=new GridPane();
         gridPane.setHgap(20.00);
         gridPane.setVgap(20.00);
-        gridPane.setStyle("-fx-font-size : 10pt;");
+        gridPane.setStyle("-fx-background-color: #D3D3D3; ");
+        gridPane.setStyle("-fx-font-size : 24pt;");
         gridPane.setAlignment(Pos.CENTER);
 
         for (int i = 0; i < 3; i++) {
@@ -148,6 +180,7 @@ public class TicTacToe extends Application {
 
                 button.setPrefSize(75,75);
                 button.setOnAction(actionEvent ->buttonClick(button));
+
                 buttons[i][j]=button;
                 gridPane.add(button,j,i);
             }
@@ -157,15 +190,36 @@ public class TicTacToe extends Application {
         BorderPane.setAlignment(gridPane, Pos.CENTER);
 
 //        Score
-        HBox scoreBoard=new HBox(20);
+        VBox scoreBoard=new VBox(20);
         scoreBoard.setAlignment(Pos.CENTER);
         playerXScoreLabel=new Label("Player X : 0");
         playerXScoreLabel.setStyle("-fx-font-size : 16pt;-fx-font-weight : bold;");
         playerOScoreLabel=new Label("Player O : 0");
         playerOScoreLabel.setStyle("-fx-font-size : 16pt; -fx-font-weight : bold;");
         scoreBoard.getChildren().addAll(playerXScoreLabel,playerOScoreLabel);
-        root.setBottom(scoreBoard);
-//        root.setPrefSize(500.00,250.00);
+        scoreBoard.setSpacing(5);
+
+
+//      undo button
+        Button btn=new Button();
+        btn.setText("Undo");
+        btn.setStyle("-fx-font-size : 12pt; -fx-font-weight : bold");
+        btn.setOnAction(actionEvent -> undo());
+
+//        reset button
+        Button btn2=new Button();
+        btn2.setText("Reset");
+        btn2.setStyle("-fx-font-size : 12pt; -fx-font-weight : bold");
+        btn2.setOnAction(actionEvent -> reset());
+
+        VBox Vbox=new VBox(btn,btn2);
+        Vbox.setAlignment(Pos.BOTTOM_LEFT);
+        Vbox.setSpacing(5);
+        HBox hbox=new HBox(scoreBoard,Vbox);
+        hbox.setSpacing(86);
+        root.setBottom(hbox);
+        BorderPane.setAlignment(hbox,Pos.BOTTOM_CENTER);
+
         return root;
     }
     @Override
